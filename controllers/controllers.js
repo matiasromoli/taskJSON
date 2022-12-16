@@ -1,15 +1,21 @@
-import { Contenedor } from "../main.js";
-const conteiner = new Contenedor("./json/data.json");
+import {
+  addTask,
+  listTask,
+  deleteTask,
+} from "../src/services/operaciones.service.js";
 
 export const controllers = {
   homeView: async (req, res) => {
-    const task = await conteiner.listAll();
-
-    res.render("index", {
-      message: req.flash("success_msg"),
-      title: "Home",
-      task,
-    });
+    try {
+      const task = await listTask();
+      res.render("index", {
+        message: req.flash("success_msg"),
+        title: "Home",
+        task,
+      });
+    } catch (error) {
+      res.status(400);
+    }
   },
   formView: (req, res) => {
     res.render("form", {
@@ -18,19 +24,21 @@ export const controllers = {
     });
   },
   formData: async (req, res) => {
-    const newTask = {
-      title: req.body.title,
-      description: req.body.description,
-    };
-
-    await conteiner.save(newTask);
-
-    req.flash("success_msg", "Task add succesfully.");
-    res.redirect("/");
+    try {
+      await addTask(req);
+      req.flash("success_msg", "Task add succesfully.");
+      res.redirect("/");
+    } catch (error) {
+      res.status(400).json(error);
+    }
   },
   formDelete: async (req, res) => {
-    await conteiner.delete(req.params.id);
-    req.flash("success_msg", "Task deleted successfully.");
-    res.redirect("/");
+    try {
+      await deleteTask(req);
+      req.flash("success_msg", "Task deleted successfully.");
+      res.redirect("/");
+    } catch (error) {
+      res.status(400).json(error);
+    }
   },
 };

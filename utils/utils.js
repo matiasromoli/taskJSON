@@ -6,7 +6,6 @@ export function url(data) {
   const __dirname = dirname(__filename);
   return __dirname;
 }
-
 export function verify(req, res, next) {
   let { title, description } = req.body;
 
