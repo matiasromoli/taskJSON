@@ -1,21 +1,16 @@
-import {
-  addTask,
-  listTask,
-  deleteTask,
-} from "../src/services/operaciones.service.js";
+import { ContenedorService } from "../src/services/operaciones.service.js";
+import { Error } from "../src/classes/error.js";
+const contenedorApp = new ContenedorService();
 
 export const controllers = {
   homeView: async (req, res) => {
-    try {
-      const task = await listTask();
-      res.render("index", {
-        message: req.flash("success_msg"),
-        title: "Home",
-        task,
-      });
-    } catch (error) {
-      res.status(400);
-    }
+    const task = await contenedorApp.listTask();
+
+    res.render("index", {
+      message: req.flash("success_msg"),
+      title: "Home",
+      task,
+    });
   },
   formView: (req, res) => {
     res.render("form", {
@@ -25,20 +20,20 @@ export const controllers = {
   },
   formData: async (req, res) => {
     try {
-      await addTask(req);
+      await contenedorApp.addTask(req);
       req.flash("success_msg", "Task add succesfully.");
       res.redirect("/");
     } catch (error) {
-      res.status(400).json(error);
+      throw new Error(500, "Task not saved", error);
     }
   },
   formDelete: async (req, res) => {
     try {
-      await deleteTask(req);
+      await contenedorApp.deleteTask(req);
       req.flash("success_msg", "Task deleted successfully.");
       res.redirect("/");
     } catch (error) {
-      res.status(400).json(error);
+      throw new Error(500, "Task not deleted", error);
     }
   },
 };

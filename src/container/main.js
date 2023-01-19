@@ -1,3 +1,4 @@
+import { Error } from "../classes/error.js";
 import fs from "fs/promises";
 
 export class Contenedor {
@@ -29,14 +30,18 @@ export class Contenedor {
       });
 
       await fs.writeFile(this.ruta, JSON.stringify(data, null, 2));
-    } catch (err) {
-      return err;
+    } catch (error) {
+      throw new Error(500, "Failed to save task", error);
     }
   }
   async delete(ident) {
-    const data = await this.listAll();
+    try {
+      const data = await this.listAll();
 
-    const obj = data.filter((o) => o.id !== parseInt(ident));
-    await fs.writeFile(this.ruta, JSON.stringify(obj, null, 2));
+      const obj = data.filter((o) => o.id !== parseInt(ident));
+      await fs.writeFile(this.ruta, JSON.stringify(obj, null, 2));
+    } catch (error) {
+      throw new Error(500, "Failed to delete task", error);
+    }
   }
 }
